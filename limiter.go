@@ -1,3 +1,10 @@
+/*
+Package limiter provides a singular type that allows you to control concurrent
+execution by specifying a maximum number of tasks.
+
+It allows you to then block until tasks complete before spawning new ones, and
+also block on all tasks until they have completed.
+*/
 package limiter
 
 import "sync"
