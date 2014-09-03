@@ -9,7 +9,7 @@ package limiter
 
 import "sync"
 
-// Limiter is a coordinator that waits on current tasks to complete before 
+// Limiter is a coordinator that waits on current tasks to complete before
 // allowing new ones to start.
 type Limiter struct {
 	cond        *sync.Cond

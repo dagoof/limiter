@@ -13,6 +13,12 @@ func ExampleLimiter() {
 		results = make(chan int)
 	)
 
+	go func() {
+		for i := 0; i < njobs; i++ {
+			jobs <- i
+		}
+	}()
+
 	work := func(l *Limiter, in <-chan int, out chan<- int) {
 		n := <-in
 		defer fmt.Println("done working", n)
@@ -28,7 +34,6 @@ func ExampleLimiter() {
 
 			fmt.Println("spawning worker", i)
 			go work(limiter, jobs, results)
-			jobs <- i
 		}
 		limiter.WaitDone()
 		close(results)
