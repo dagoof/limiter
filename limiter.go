@@ -9,12 +9,15 @@ package limiter
 
 import "sync"
 
+// Limiter is a coordinator that waits on current tasks to complete before 
+// allowing new ones to start.
 type Limiter struct {
 	cond        *sync.Cond
 	wg          *sync.WaitGroup
 	active, max int
 }
 
+// New creates a Limiter with a maximum number of concurrent tasks.
 func New(max int) *Limiter {
 	return &Limiter{
 		sync.NewCond(&sync.Mutex{}),
@@ -38,6 +41,8 @@ func (l *Limiter) add() {
 	l.wg.Add(1)
 }
 
+// Wait blocks while the limiter is not ready to proceed. Once the limiter is
+// ready to go ahead, wait allows progress and notes the number of active tasks.
 func (l *Limiter) Wait() {
 	l.cond.L.Lock()
 	for !l.ready() {
@@ -48,6 +53,8 @@ func (l *Limiter) Wait() {
 	l.cond.L.Unlock()
 }
 
+// Done tells the limiter that a task has completed and that it can allow
+// another task to proceed.
 func (l *Limiter) Done() {
 	l.cond.L.Lock()
 	l.done()
@@ -55,6 +62,7 @@ func (l *Limiter) Done() {
 	l.cond.L.Unlock()
 }
 
+// WaitDone blocks until all tasks running in the limiter call Done.
 func (l *Limiter) WaitDone() {
 	l.wg.Wait()
 }
